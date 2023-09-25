@@ -23,21 +23,16 @@ set(LIB_LIST ${NCNN_LIBS} ${OpenCV_LIBS})
 
 include_directories(./)
 
-set(SRC_Net
-Net/NetNCNN.cpp
-Net/NetRKNN.cpp)
-
 set(SRC_Predictor
-Predictor/Predictor.cpp)
+Predictor/Predictor.cpp
+Predictor/Net/NetNCNN.cpp
+Predictor/Net/NetRKNN.cpp
+Predictor/PreProcessor/PreProcessor.cpp
+Predictor/PostProcessor/PostProcessor.cpp
+Predictor/PostProcessor/PostUnit.cpp
+)
 
-set(SRC_PreProcessor
-PreProcessor/PreProcessor.cpp)
-
-set(SRC_PostProcessor
-PostProcessor/PostProcessor.cpp
-PostProcessor/PostUnit.cpp)
-
-set(SRC_LIST main.cpp ${SRC_Net} ${SRC_Predictor} ${SRC_PreProcessor} ${SRC_PostProcessor})
+set(SRC_LIST main.cpp ${SRC_Predictor})
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME} ${LIB_LIST} OpenMP::OpenMP_CXX)
