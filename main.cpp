@@ -102,7 +102,7 @@ void test_ncnn_example(){
 }
 
 void test_Predictor(){
-    std::string srcImgPath{"./imgs/face001.jpg"};
+    std::string srcImgPath{"./imgs/face002.jpg"};
 
     NetNCNNConfig netConfig;
     netConfig.inputShape = std::array<int, 2>{160, 160};
@@ -129,14 +129,14 @@ void test_Predictor(){
 
     Predictor* predictor = new Predictor(config);
 
-    Predictor::Input input;
-    input.data = srcImg.data;
-    input.dataW = srcImgW;
-    input.dataH = srcImgH;
+    PreProcessor::Tensor tensor;
+    tensor.data = srcImg.data;
+    tensor.dataW = srcImgW;
+    tensor.dataH = srcImgH;
 
     // Predictor::Output output;
     PostUnit::Output output;
-    predictor->run(input, output);
+    predictor->run(tensor, output);
 
     // show
     cv::Mat showImg = srcImg.clone();

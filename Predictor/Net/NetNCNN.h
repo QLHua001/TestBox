@@ -18,11 +18,9 @@ public:
     virtual ~NetNCNN();
 
     virtual int init(NetConfig* netConfig);
-
     virtual int run(const NetInput& input, NetOutput& output);
 
 private:
     NetNCNNConfig config;
-    
     HANDLE net;
 };

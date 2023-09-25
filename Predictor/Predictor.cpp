@@ -35,31 +35,16 @@ Predictor::~Predictor(){
     this->postProcessor = nullptr;
 }
 
-int Predictor::run(Input input, PostUnit::Output& output){
+int Predictor::run(const PreProcessor::Tensor& input, PostUnit::Output& output){
+    
+    PreProcessor::Tensor outputTensor;
+    this->preProcessor->run(input, outputTensor);
 
-    PreProcessor::Tensor preTensor;
-    preTensor.data = input.data;
-    preTensor.dataW = input.dataW;
-    preTensor.dataH = input.dataH;
-    this->preProcessor->run(preTensor, this->preTensor);
-
-    printf("output: %d, %d, %f, %f\n", this->preTensor.dataW, this->preTensor.dataH, this->preTensor.sx, this->preTensor.sy);
-
-    NetInput netInput;
-    netInput.data = this->preTensor.data;
-    netInput.dataW = this->preTensor.dataW;
-    netInput.dataH = this->preTensor.dataH;
-
+    NetInput netInput = {outputTensor.data, outputTensor.dataW, outputTensor.dataH};
     NetOutput netOuptut;
     this->net->run(netInput, netOuptut);
 
-
-    PostUnit::Input postInput;
-    postInput.data = netOuptut.data;
-    postInput.netInputSize = std::array<int, 2>{netInput.dataW, netInput.dataH};
-    postInput.srcInputSize = std::array<int, 2>{input.dataW, input.dataH};
-
-    // PostUnit::Output postOutput;
+    PostUnit::Input postInput = {netOuptut.data, netInput.dataW, netInput.dataH, input.dataW, input.dataH};
     this->postProcessor->run(postInput, output);
 
     return 0;

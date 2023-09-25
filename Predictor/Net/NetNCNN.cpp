@@ -16,7 +16,6 @@ NetNCNN::~NetNCNN(){
 }
 
 int NetNCNN::init(NetConfig* netConfig){
-    printf("ncnn init.\n");
 
     int ret;
     NetNCNNConfig* config = (NetNCNNConfig*)netConfig;
