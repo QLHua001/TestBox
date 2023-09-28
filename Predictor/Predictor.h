@@ -8,9 +8,9 @@
 class Predictor{
 public:
     struct Config{
-        NetType netType;
-        NetConfig* netConfig;
-        PostType postType;
+        NetConfig* netConfig{nullptr};
+        PreProcessor::Config* preConfig{nullptr};
+        PostUnit::Config* postConfig{nullptr};
     };
 
 public:
@@ -23,4 +23,6 @@ private:
     Net* net = nullptr;
     PreProcessor* preProcessor = nullptr;
     PostProcessor* postProcessor = nullptr;
+
+    unsigned char* ptrTensor = nullptr;
 };

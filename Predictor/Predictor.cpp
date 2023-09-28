@@ -3,18 +3,17 @@
 
 Predictor::Predictor(Config config){
 
-    this->net = NetCreator::createNet(config.netType, config.netConfig);
+    this->net = NetCreator::createNet(config.netConfig);
     if(this->net == nullptr){
         printf("NetCreator::createNet fail!\n");
     }
 
-    PreProcessor::Config preConfig;
-    preConfig.targetSize = std::array<int, 2>{config.netConfig->inputShape[0], config.netConfig->inputShape[1]};
-    this->preProcessor = new PreProcessor(&preConfig);
+    config.preConfig->targetSize = std::array<int, 2>{config.netConfig->inputShape[0], config.netConfig->inputShape[1]};
+    this->preProcessor = new PreProcessor(config.preConfig);
+    
+    this->postProcessor = new PostProcessor(config.postConfig);
 
-    PostProcessor::Config postConfig;
-    postConfig.postType = config.postType;
-    this->postProcessor = new PostProcessor(&postConfig);
+    this->ptrTensor = new unsigned char[config.netConfig->inputShape[0] * config.netConfig->inputShape[1] * 3];
 
 }
 
@@ -33,11 +32,17 @@ Predictor::~Predictor(){
         delete this->postProcessor;
     }
     this->postProcessor = nullptr;
+
+    if(this->ptrTensor){
+        delete[] this->ptrTensor;
+    }
+    this->ptrTensor = nullptr;
 }
 
 int Predictor::run(const PreProcessor::Tensor& input, PostUnit::Output& output){
     
     PreProcessor::Tensor outputTensor;
+    outputTensor.data = this->ptrTensor; // 预分配内存
     this->preProcessor->run(input, outputTensor);
 
     NetInput netInput = {outputTensor.data, outputTensor.dataW, outputTensor.dataH};

@@ -3,20 +3,15 @@
 #include "NetNCNN.h"
 #include "NetRKNN.h"
 
-enum NetType{
-    NET_NCNN,
-    NET_RKNN
-};
-
 class NetCreator{
 
 public:
-    static Net* createNet(NetType netType, NetConfig* netConfig){
+    static Net* createNet(NetConfig* netConfig){
         int ret;
         Net* net = nullptr;
 
         try{
-            switch(netType){
+            switch(netConfig->netType){
             case NetType::NET_NCNN:{
                 net = new NetNCNN();
                 break;

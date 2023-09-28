@@ -52,7 +52,8 @@ int NetNCNN::run(const NetInput& input, NetOutput& output){
         ex.extract(this->config.outputNodeVec[i], outputDataVec[i]);
 
         float* ptrData = (float*)outputDataVec[i].data;
-        for(int j = 0; j < outputDataVec[i].w; j++){
+        int dataLen = outputDataVec[i].d * outputDataVec[i].c * outputDataVec[i].h * outputDataVec[i].w;
+        for(int j = 0; j < dataLen; j++){
             output.data[i].push_back(ptrData[j]);
         }
     }

@@ -1,11 +1,16 @@
 #include "PostProcessor.h"
 
-PostProcessor::PostProcessor(Config* config){
-    this->config = Config(*config);
+PostProcessor::PostProcessor(PostUnit::Config* config){
+    // this->config = Config(*config);
 
-    switch(this->config.postType){
+    switch(config->postType){
     case POST_DMS_MTFACE:{
-        this->postUnit = new PostDmsMTFace();
+        this->postUnit = new PostDMSMTFace();
+        break;
+    }
+    case POST_DMS_MTYOLOX:{
+        this->postUnit = new PostDMSMTYolox();
+        break;
     }
     }
 

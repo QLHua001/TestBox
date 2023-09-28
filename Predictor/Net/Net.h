@@ -5,7 +5,13 @@
 
 typedef long long HANDLE;
 
+enum NetType{
+    NET_NCNN,
+    NET_RKNN
+};
+
 struct NetConfig{
+    NetType netType;
     std::array<int, 2> inputShape;
     std::array<float, 3> meanVal;
     std::array<float, 3> stdVal;

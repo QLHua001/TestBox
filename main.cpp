@@ -4,8 +4,11 @@
 #include <array>
 #include <ncnn/net.h>
 #include <opencv2/opencv.hpp>
-#include "models/ncnn/DFMTN/DFMTN_16f.param.h"
-#include "models/ncnn/DFMTN/DFMTN_16f.bin.h"
+#include "models/ncnn/DMSMTFace/DFMTN_16f.param.h"
+#include "models/ncnn/DMSMTFace/DFMTN_16f.bin.h"
+#include "models/ncnn/DMSMTYolox/Yolox_16f.param.h"
+#include "models/ncnn/DMSMTYolox/Yolox_16f.bin.h"
+// #include 
 
 #include "Predictor/Predictor.h"
 
@@ -105,6 +108,7 @@ void test_Predictor(){
     std::string srcImgPath{"./imgs/face002.jpg"};
 
     NetNCNNConfig netConfig;
+    netConfig.netType = NetType::NET_NCNN;
     netConfig.inputShape = std::array<int, 2>{160, 160};
     netConfig.meanVal = std::array<float, 3>{127.5f, 127.5f, 127.5f};
     netConfig.stdVal = std::array<float, 3>{0.0078125f, 0.0078125f, 0.0078125f};
@@ -112,6 +116,13 @@ void test_Predictor(){
     netConfig.modelBin = DFMTN_16f_bin;
     netConfig.inputNodeVec = std::vector<int>{DFMTN_16f_param_id::BLOB_input};
     netConfig.outputNodeVec = std::vector<int>{DFMTN_16f_param_id::BLOB_lds, DFMTN_16f_param_id::BLOB_euler, DFMTN_16f_param_id::BLOB_cls1, DFMTN_16f_param_id::BLOB_cls2};
+
+    PreProcessor::Config preConfig;
+
+    // PostProcessor::Config postConfig;
+    // postConfig.postType = PostType::POST_DMS_MTFACE;
+    PostDMSMTFace::Config postConfig;
+    postConfig.postType = PostType::POST_DMS_MTFACE;
 
     // imread
     cv::Mat srcImg = cv::imread(srcImgPath);
@@ -123,9 +134,11 @@ void test_Predictor(){
     int srcImgH = srcImg.rows;
 
     Predictor::Config config;
-    config.netType = NetType::NET_NCNN;
+    // config.netType = NetType::NET_NCNN;
     config.netConfig = &netConfig;
-    config.postType = PostType::POST_DMS_MTFACE;
+    // config.postType = PostType::POST_DMS_MTFACE;
+    config.preConfig = &preConfig;
+    config.postConfig = &postConfig;
 
     Predictor* predictor = new Predictor(config);
 
@@ -157,11 +170,69 @@ void test_Predictor(){
 
 }
 
+void test_DMSMTYolox(){
+
+    std::string srcImgPath{R"(./imgs/test.jpg)"};
+
+    NetNCNNConfig netConfig;
+    netConfig.netType = NetType::NET_NCNN;
+    netConfig.inputShape = std::array<int, 2>{416, 256};
+    netConfig.meanVal = std::array<float, 3>{127.5f, 127.5f, 127.5f};
+    netConfig.stdVal = std::array<float, 3>{0.0078125f, 0.0078125f, 0.0078125f};
+    netConfig.modelParam = Yolox_16f_param_bin;
+    netConfig.modelBin = Yolox_16f_bin;
+    netConfig.inputNodeVec = std::vector<int>{Yolox_16f_param_id::BLOB_input};
+    netConfig.outputNodeVec = std::vector<int>{
+        Yolox_16f_param_id::BLOB_bbox8, Yolox_16f_param_id::BLOB_obj8, Yolox_16f_param_id::BLOB_cls8,
+        Yolox_16f_param_id::BLOB_bbox16, Yolox_16f_param_id::BLOB_obj16, Yolox_16f_param_id::BLOB_cls16,
+        Yolox_16f_param_id::BLOB_bbox32, Yolox_16f_param_id::BLOB_obj32, Yolox_16f_param_id::BLOB_cls32,
+        Yolox_16f_param_id::BLOB_bbox64, Yolox_16f_param_id::BLOB_obj64, Yolox_16f_param_id::BLOB_cls64,
+        Yolox_16f_param_id::BLOB_output_1
+    };
+
+    PreProcessor::Config preConfig;
+    // PostProcessor::Config postConfig;
+    // postConfig.postType = PostType::POST_DMS_MTYOLOX;
+    PostDMSMTYolox::Config postConfig;
+    postConfig.postType = PostType::POST_DMS_MTYOLOX;
+
+    Predictor::Config config;
+    // config.netType = NetType::NET_NCNN;
+    config.netConfig = &netConfig;
+    // config.postType = PostType::POST_DMS_MTYOLOX;
+    config.preConfig = &preConfig;
+    config.postConfig = &postConfig;
+
+    Predictor predictor(config);
+
+    cv::Mat srcImg = cv::imread(srcImgPath);
+    if(srcImg.empty()){
+        printf("imread %s fail!\n", srcImgPath.c_str());
+        return;
+    }
+    int srcImgW = srcImg.cols;
+    int srcImgH = srcImg.rows;
+
+
+    PreProcessor::Tensor tensor;
+    tensor.data = srcImg.data;
+    tensor.dataW = srcImgW;
+    tensor.dataH = srcImgH;
+
+    PostUnit::Output output;
+    
+    predictor.run(tensor, output);
+}
+
 int main(int argc, char* argv[]) {
     std::cout << "Hello, world!\n";
 
     // test_ncnn_example();
 
     test_Predictor();
+
+    // test_DMSMTYolox();
+
+    return 0;
 
 }

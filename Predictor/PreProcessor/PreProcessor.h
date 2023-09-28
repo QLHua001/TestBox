@@ -6,7 +6,7 @@ class PreProcessor{
 public:
 
 struct Config{
-    std::array<int, 2> targetSize;
+    std::array<int, 2> targetSize{-1, -1};
 };
 
 struct Tensor{

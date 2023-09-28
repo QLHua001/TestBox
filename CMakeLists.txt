@@ -14,7 +14,7 @@ link_directories(${NCNN_DIR}/lib/)
 set(NCNN_LIBS libncnn.a)
 
 # opencv
-set(OpenCV_DIR /QMy-File2/QPackage/opencv-4.8.0/output_host_ubuntu2004/)
+set(OpenCV_DIR /QMy-File2/QPackage/opencv-4.8.0/output_host_ubuntu2004_debug/)
 include_directories(${OpenCV_DIR}/include/opencv4/)
 link_directories(${OpenCV_DIR}/lib/)
 set(OpenCV_LIBS libopencv_world.so)
